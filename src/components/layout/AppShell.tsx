@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAppStore } from '../../store/useAppStore'
-import { UserSwitcher } from './UserSwitcher'
+import { AccountMenu } from './AccountMenu'
 import { pendingIncomingRequests } from '../../lib/selectors'
 
 const NAV_ITEMS = [
@@ -16,7 +16,6 @@ export function AppShell() {
   const currentUserId = useAppStore((state) => state.currentUserId)
   const follows = useAppStore((state) => state.follows)
   const forums = useAppStore((state) => state.forums)
-  const resetDemoData = useAppStore((state) => state.resetDemoData)
 
   const followRequestCount = currentUserId ? pendingIncomingRequests(follows, currentUserId).length : 0
   const forumRequestCount = currentUserId
@@ -31,57 +30,43 @@ export function AppShell() {
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-          <NavLink to="/" className="text-lg font-bold text-brand-800">
+      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
+          <NavLink to="/" className="shrink-0 text-lg font-bold tracking-tight text-brand-800">
             Enabled
           </NavLink>
-          {currentUserId && (
-            <nav aria-label="Primary" className="order-3 w-full sm:order-none sm:w-auto">
-              <ul className="flex flex-wrap gap-1">
-                {NAV_ITEMS.map((item) => (
-                  <li key={item.to}>
-                    <NavLink
-                      to={item.to}
-                      end={item.end}
-                      className={({ isActive }) =>
-                        `relative flex min-h-[40px] items-center rounded-lg px-3 text-sm font-medium ${
-                          isActive ? 'bg-brand-700 text-white' : 'text-slate-700 hover:bg-slate-100'
-                        }`
-                      }
-                    >
-                      {item.label}
-                      {item.to === '/requests' && requestCount > 0 && (
-                        <span
-                          className="ml-1.5 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-600 px-1 text-xs font-semibold text-white"
-                          aria-label={`${requestCount} pending`}
-                        >
-                          {requestCount}
-                        </span>
-                      )}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          )}
-          {currentUserId && (
-            <div className="flex items-center gap-2">
-              <UserSwitcher />
-              <button
-                type="button"
-                className="btn-ghost text-sm"
-                onClick={() => {
-                  if (window.confirm('Reset all demo data back to the original seed? This cannot be undone.')) {
-                    resetDemoData()
-                  }
-                }}
-              >
-                Reset demo data
-              </button>
-            </div>
-          )}
+          {currentUserId && <AccountMenu />}
         </div>
+
+        {currentUserId && (
+          <nav aria-label="Primary" className="border-t border-slate-100">
+            <ul className="no-scrollbar mx-auto flex max-w-5xl gap-1 overflow-x-auto px-4 py-2">
+              {NAV_ITEMS.map((item) => (
+                <li key={item.to} className="shrink-0">
+                  <NavLink
+                    to={item.to}
+                    end={item.end}
+                    className={({ isActive }) =>
+                      `relative flex min-h-[40px] items-center whitespace-nowrap rounded-lg px-3 text-sm font-medium transition-colors ${
+                        isActive ? 'bg-brand-700 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                      }`
+                    }
+                  >
+                    {item.label}
+                    {item.to === '/requests' && requestCount > 0 && (
+                      <span
+                        className="ml-1.5 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-600 px-1 text-xs font-semibold text-white"
+                        aria-label={`${requestCount} pending`}
+                      >
+                        {requestCount}
+                      </span>
+                    )}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
       </header>
       <main id="main-content" className="mx-auto max-w-5xl px-4 py-6">
         <Outlet />

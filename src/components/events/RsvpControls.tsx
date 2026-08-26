@@ -37,7 +37,7 @@ export function RsvpControls({ event }: { event: EventItem }) {
       {myRsvp && (
         <button
           type="button"
-          className="btn-ghost text-sm"
+          className="min-h-[44px] rounded-lg px-2 text-sm font-medium text-slate-500 underline-offset-2 hover:text-slate-700 hover:underline"
           onClick={() => {
             cancelRsvp(event.id, currentUserId)
             announce(`RSVP cancelled for ${event.title}`)

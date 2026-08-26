@@ -54,11 +54,25 @@
     @apply rounded-xl border border-slate-200 bg-white shadow-sm;
   }
 
+  .card-interactive {
+    @apply card transition-all hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-md;
+  }
+
   .input {
-    @apply min-h-[44px] w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-600;
+    @apply min-h-[44px] w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-brand-600;
   }
 
   .label {
     @apply mb-1 block text-sm font-medium text-slate-700;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }

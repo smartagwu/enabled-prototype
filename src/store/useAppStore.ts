@@ -27,7 +27,7 @@ interface AppState {
 
   setCurrentUser: (userId: string) => void
   signOut: () => void
-  resetDemoData: () => void
+  resetAppData: () => void
 
   sendFollowRequest: (followerId: string, followeeId: string) => void
   respondToFollowRequest: (edgeId: string, accept: boolean) => void
@@ -70,7 +70,7 @@ export const useAppStore = create<AppState>()(
 
       setCurrentUser: (userId) => set({ currentUserId: userId }),
       signOut: () => set({ currentUserId: null }),
-      resetDemoData: () => set({ currentUserId: null, ...freshSeed() }),
+      resetAppData: () => set({ currentUserId: null, ...freshSeed() }),
 
       sendFollowRequest: (followerId, followeeId) => {
         if (followerId === followeeId) return

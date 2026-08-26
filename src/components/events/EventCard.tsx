@@ -8,7 +8,7 @@ export function EventCard({ event }: { event: EventItem }) {
   return (
     <Link
       to={`/events/${event.id}`}
-      className="card group flex flex-col overflow-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-600"
+      className="card-interactive group flex flex-col overflow-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-600"
     >
       <div className={`h-28 w-full bg-gradient-to-br ${event.coverColor}`} aria-hidden="true" />
       <div className="flex flex-1 flex-col gap-2 p-4">

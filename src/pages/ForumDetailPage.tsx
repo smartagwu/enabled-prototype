@@ -75,7 +75,9 @@ export function ForumDetailPage() {
           )}
 
           {!isMember && myJoinRequest?.status === 'pending' && (
-            <span className="btn-secondary cursor-default">Request pending</span>
+            <button type="button" className="btn-secondary" disabled>
+              Request pending
+            </button>
           )}
 
           {isMember && !isOwner && (

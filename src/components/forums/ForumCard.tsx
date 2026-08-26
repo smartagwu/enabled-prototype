@@ -3,7 +3,7 @@ import type { Forum } from '../../types'
 
 export function ForumCard({ forum }: { forum: Forum }) {
   return (
-    <Link to={`/forums/${forum.id}`} className="card flex flex-col gap-2 p-4 hover:border-brand-300">
+    <Link to={`/forums/${forum.id}`} className="card-interactive flex flex-col gap-2 p-4">
       <div className="flex items-center justify-between gap-2">
         <h3 className="font-semibold text-slate-900">{forum.title}</h3>
         <span

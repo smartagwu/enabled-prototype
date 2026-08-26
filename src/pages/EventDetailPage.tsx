@@ -40,16 +40,17 @@ export function EventDetailPage() {
         </p>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <RsvpControls event={event} />
-        <button type="button" className="btn-primary" onClick={() => setShowTicketModal(true)}>
-          Get tickets
-        </button>
+      <div className="card space-y-3 p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <RsvpControls event={event} />
+          <button type="button" className="btn-primary sm:shrink-0" onClick={() => setShowTicketModal(true)}>
+            Get tickets
+          </button>
+        </div>
+        <p className="text-sm text-slate-500">
+          {goingCount} going · {spotsLeft} of {event.capacity} spots left
+        </p>
       </div>
-
-      <p className="text-sm text-slate-500">
-        {goingCount} going · {spotsLeft} of {event.capacity} spots left
-      </p>
 
       {myTickets.length > 0 && (
         <div className="card p-4">
