@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { EventItem, Ticket } from '../../types'
 import { useAppStore } from '../../store/useAppStore'
-import { useAnnounce } from '../common/LiveAnnouncer'
+import { useAnnounce } from '../common/AnnounceContext'
 import { Modal } from '../common/Modal'
 import { formatCurrency } from '../../lib/format'
 

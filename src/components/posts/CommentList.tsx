@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Comment } from '../../types'
 import { useAppStore } from '../../store/useAppStore'
-import { useAnnounce } from '../common/LiveAnnouncer'
+import { useAnnounce } from '../common/AnnounceContext'
 import { Avatar } from '../common/Avatar'
 import { MentionText } from '../common/MentionText'
 import { MentionTextarea } from '../common/MentionTextarea'

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAppStore, useFollowingUsers } from '../../store/useAppStore'
 import { Modal } from '../common/Modal'
 import { Avatar } from '../common/Avatar'
-import { useAnnounce } from '../common/LiveAnnouncer'
+import { useAnnounce } from '../common/AnnounceContext'
 
 export function CreateGroupModal({ onClose }: { onClose: () => void }) {
   const currentUserId = useAppStore((state) => state.currentUserId)

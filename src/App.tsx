@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { LiveAnnouncerProvider } from './components/common/LiveAnnouncer'
+import LiveAnnouncerProvider from './components/common/LiveAnnouncer'
 import { AppShell } from './components/layout/AppShell'
 import { RequireAuth } from './components/layout/RequireAuth'
 import { LoginPage } from './pages/LoginPage'

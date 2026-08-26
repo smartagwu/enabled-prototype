@@ -4,8 +4,8 @@ import { PostComposer } from '../components/posts/PostComposer'
 import { PostCard } from '../components/posts/PostCard'
 import { Avatar } from '../components/common/Avatar'
 import { EmptyState } from '../components/common/EmptyState'
-import { useAnnounce } from '../components/common/LiveAnnouncer'
 import { userById } from '../lib/selectors'
+import { useAnnounce } from '../components/common/AnnounceContext'
 
 export function ForumDetailPage() {
   const { forumId } = useParams<{ forumId: string }>()

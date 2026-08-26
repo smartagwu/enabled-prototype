@@ -1,11 +1,10 @@
-import { createContext, useCallback, useContext, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import { AnnounceContext } from './AnnounceContext'
 
-const AnnounceContext = createContext<(message: string) => void>(() => {})
-
-export function LiveAnnouncerProvider({ children }: { children: ReactNode }) {
+function LiveAnnouncerProvider({ children }: { children: ReactNode }) {
   const [message, setMessage] = useState('')
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>()
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const announce = useCallback((next: string) => {
     setMessage('')
@@ -23,6 +22,4 @@ export function LiveAnnouncerProvider({ children }: { children: ReactNode }) {
   )
 }
 
-export function useAnnounce() {
-  return useContext(AnnounceContext)
-}
+export default LiveAnnouncerProvider

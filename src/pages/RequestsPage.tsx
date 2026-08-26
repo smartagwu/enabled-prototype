@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom'
 import { useAppStore } from '../store/useAppStore'
 import { Avatar } from '../components/common/Avatar'
 import { EmptyState } from '../components/common/EmptyState'
-import { useAnnounce } from '../components/common/LiveAnnouncer'
 import { pendingIncomingRequests, userById } from '../lib/selectors'
+import { useAnnounce } from '../components/common/AnnounceContext'
 
 export function RequestsPage() {
   const currentUserId = useAppStore((state) => state.currentUserId)

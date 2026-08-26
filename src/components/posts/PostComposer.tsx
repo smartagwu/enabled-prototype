@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAppStore } from '../../store/useAppStore'
 import { MentionTextarea } from '../common/MentionTextarea'
-import { useAnnounce } from '../common/LiveAnnouncer'
+import { useAnnounce } from '../common/AnnounceContext'
 
 export function PostComposer({
   forumId,

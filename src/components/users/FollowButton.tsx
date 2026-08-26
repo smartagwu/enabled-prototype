@@ -1,6 +1,6 @@
 import { useAppStore } from '../../store/useAppStore'
 import { followStateBetween } from '../../lib/selectors'
-import { useAnnounce } from '../common/LiveAnnouncer'
+import { useAnnounce } from '../common/AnnounceContext'
 
 export function FollowButton({ targetUserId, targetName }: { targetUserId: string; targetName: string }) {
   const currentUserId = useAppStore((state) => state.currentUserId)

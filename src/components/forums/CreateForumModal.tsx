@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import type { ForumVisibility } from '../../types'
 import { useAppStore } from '../../store/useAppStore'
 import { Modal } from '../common/Modal'
-import { useAnnounce } from '../common/LiveAnnouncer'
+import { useAnnounce } from '../common/AnnounceContext'
 
 export function CreateForumModal({ onClose }: { onClose: () => void }) {
   const currentUserId = useAppStore((state) => state.currentUserId)

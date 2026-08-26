@@ -1,6 +1,6 @@
 import { useAppStore } from '../../store/useAppStore'
-import { useAnnounce } from '../common/LiveAnnouncer'
 import type { EventItem } from '../../types'
+import { useAnnounce } from '../common/AnnounceContext'
 
 export function RsvpControls({ event }: { event: EventItem }) {
   const currentUserId = useAppStore((state) => state.currentUserId)
