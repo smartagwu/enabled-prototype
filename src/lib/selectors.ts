@@ -1,4 +1,4 @@
-import type { FollowEdge, User } from '../types'
+import type { BlockEdge, EventItem, FollowEdge, User } from '../types'
 
 export type FollowState = 'none' | 'pending' | 'accepted'
 
@@ -40,4 +40,24 @@ export function userById(users: User[], id: string | undefined | null): User | u
 
 export function displayName(users: User[], id: string): string {
   return userById(users, id)?.name ?? 'Unknown member'
+}
+
+export function hasBlocked(blocks: BlockEdge[], blockerId: string, blockedId: string): boolean {
+  return blocks.some((b) => b.blockerId === blockerId && b.blockedId === blockedId)
+}
+
+export function isBlockedEitherWay(blocks: BlockEdge[], a: string, b: string): boolean {
+  return hasBlocked(blocks, a, b) || hasBlocked(blocks, b, a)
+}
+
+/** Capacity minus ticket quantities and "going" RSVPs from people who don't already hold a ticket. */
+export function spotsRemaining(event: EventItem): number {
+  const ticketHolders = new Set(event.tickets.map((t) => t.userId))
+  const ticketed = event.tickets.reduce((sum, t) => sum + t.quantity, 0)
+  const goingWithoutTicket = event.rsvps.filter((r) => r.status === 'going' && !ticketHolders.has(r.userId)).length
+  return Math.max(0, event.capacity - ticketed - goingWithoutTicket)
+}
+
+export function isFreeEvent(event: EventItem): boolean {
+  return event.ticketTiers.every((t) => t.price === 0)
 }

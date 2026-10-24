@@ -25,6 +25,8 @@ export function PostComposer({
     createPost(currentUserId, body, forumId)
     setBody('')
     announce('Post shared')
+    // The Post button disables itself once the box is empty, so put focus back in the box.
+    document.getElementById(`${idPrefix}-composer`)?.focus()
   }
 
   return (

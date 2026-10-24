@@ -144,3 +144,27 @@ export interface EventItem {
   rsvps: Rsvp[]
   tickets: Ticket[]
 }
+
+export type TextSize = 100 | 125 | 150
+
+export interface DisplayPrefs {
+  textSize: TextSize
+  highContrast: boolean
+  reduceMotion: boolean
+  darkTheme: boolean
+}
+
+export interface BlockEdge {
+  blockerId: string
+  blockedId: string
+  createdAt: string
+}
+
+export interface UserReport {
+  id: string
+  reporterId: string
+  reportedId: string
+  reason: string
+  details: string
+  createdAt: string
+}

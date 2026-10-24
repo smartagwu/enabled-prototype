@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAppStore } from '../store/useAppStore'
 import { EventCard } from '../components/events/EventCard'
 import { EmptyState } from '../components/common/EmptyState'
+import { ResultsStatus } from '../components/common/ResultsStatus'
 import type { EventCategory } from '../types'
 
 export function EventsPage() {
@@ -32,14 +33,16 @@ export function EventsPage() {
             type="button"
             onClick={() => setCategory(c)}
             aria-pressed={category === c}
-            className={`min-h-[40px] rounded-full px-3 text-sm font-medium ${
-              category === c ? 'bg-brand-700 text-white' : 'bg-white text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-50'
+            className={`min-h-[44px] rounded-full px-3 text-sm font-medium ${
+              category === c ? 'bg-brand-700 text-white' : 'bg-surface text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-50'
             }`}
           >
             {c}
           </button>
         ))}
       </div>
+
+      <ResultsStatus count={filtered.length} />
 
       {filtered.length === 0 ? (
         <EmptyState title="No events in this category" description="Check back soon or browse another category." />

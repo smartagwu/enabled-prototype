@@ -4,6 +4,7 @@ import { Avatar } from '../components/common/Avatar'
 import { EmptyState } from '../components/common/EmptyState'
 import { pendingIncomingRequests, userById } from '../lib/selectors'
 import { useAnnounce } from '../components/common/AnnounceContext'
+import { focusNeighbourAfterRemoval } from '../lib/focus'
 
 export function RequestsPage() {
   const currentUserId = useAppStore((state) => state.currentUserId)
@@ -27,7 +28,7 @@ export function RequestsPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Requests</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Follow &amp; join requests</h1>
         <p className="text-sm text-slate-600">Follow requests and forum join requests waiting on you.</p>
       </div>
 
@@ -41,19 +42,21 @@ export function RequestsPage() {
               const requester = userById(users, edge.followerId)
               if (!requester) return null
               return (
-                <li key={edge.id} className="card flex items-center justify-between gap-3 p-3">
+                <li key={edge.id} className="card flex flex-wrap items-center justify-between gap-3 p-3">
                   <Link to={`/profile/${requester.id}`} className="flex items-center gap-3">
                     <Avatar id={requester.id} name={requester.name} />
                     <span>
                       <span className="block text-sm font-medium text-slate-900">{requester.name}</span>
-                      <span className="block text-xs text-slate-500">wants to follow you</span>
+                      <span className="block text-xs text-slate-600">wants to follow you</span>
                     </span>
                   </Link>
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      className="btn-primary px-3 py-1 text-xs"
-                      onClick={() => {
+                      className="btn-primary px-3"
+                      aria-label={`Accept follow request from ${requester.name}`}
+                      onClick={(e) => {
+                        focusNeighbourAfterRemoval(e.currentTarget.closest('li'))
                         respondToFollowRequest(edge.id, true)
                         announce(`Accepted follow request from ${requester.name}`)
                       }}
@@ -62,8 +65,10 @@ export function RequestsPage() {
                     </button>
                     <button
                       type="button"
-                      className="btn-secondary px-3 py-1 text-xs"
-                      onClick={() => {
+                      className="btn-secondary px-3"
+                      aria-label={`Decline follow request from ${requester.name}`}
+                      onClick={(e) => {
+                        focusNeighbourAfterRemoval(e.currentTarget.closest('li'))
                         respondToFollowRequest(edge.id, false)
                         announce(`Declined follow request from ${requester.name}`)
                       }}
@@ -82,7 +87,7 @@ export function RequestsPage() {
         <section key={forum.id}>
           <h2 className="mb-2 text-lg font-semibold text-slate-900">
             Join requests for{' '}
-            <Link to={`/forums/${forum.id}`} className="text-brand-700 hover:underline">
+            <Link to={`/forums/${forum.id}`} className="text-brand-700 underline underline-offset-2">
               {forum.title}
             </Link>
           </h2>
@@ -91,7 +96,7 @@ export function RequestsPage() {
               const requester = userById(users, request.userId)
               if (!requester) return null
               return (
-                <li key={request.userId} className="card flex items-center justify-between gap-3 p-3">
+                <li key={request.userId} className="card flex flex-wrap items-center justify-between gap-3 p-3">
                   <Link to={`/profile/${requester.id}`} className="flex items-center gap-3">
                     <Avatar id={requester.id} name={requester.name} />
                     <span className="text-sm font-medium text-slate-900">{requester.name}</span>
@@ -99,8 +104,10 @@ export function RequestsPage() {
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      className="btn-primary px-3 py-1 text-xs"
-                      onClick={() => {
+                      className="btn-primary px-3"
+                      aria-label={`Approve ${requester.name} to join ${forum.title}`}
+                      onClick={(e) => {
+                        focusNeighbourAfterRemoval(e.currentTarget.closest('li'))
                         respondToJoinRequest(forum.id, request.userId, true)
                         announce(`Approved ${requester.name} to join ${forum.title}`)
                       }}
@@ -109,8 +116,10 @@ export function RequestsPage() {
                     </button>
                     <button
                       type="button"
-                      className="btn-secondary px-3 py-1 text-xs"
-                      onClick={() => {
+                      className="btn-secondary px-3"
+                      aria-label={`Decline ${requester.name}'s request to join ${forum.title}`}
+                      onClick={(e) => {
+                        focusNeighbourAfterRemoval(e.currentTarget.closest('li'))
                         respondToJoinRequest(forum.id, request.userId, false)
                         announce(`Declined ${requester.name}'s request to join ${forum.title}`)
                       }}

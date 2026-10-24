@@ -34,7 +34,7 @@ export function CreateGroupModal({ onClose }: { onClose: () => void }) {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="group-name" className="label">
-            Group name
+            Group name <span className="font-normal text-slate-600">(required)</span>
           </label>
           <input
             id="group-name"
@@ -60,9 +60,11 @@ export function CreateGroupModal({ onClose }: { onClose: () => void }) {
         </div>
 
         <fieldset>
-          <legend className="label">Add members you follow</legend>
+          <legend className="label">
+            Add members you follow <span className="font-normal text-slate-600">(choose at least one)</span>
+          </legend>
           {followingUsers.length === 0 ? (
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-600">
               You aren't following anyone yet. Follow people from Discover before starting a group.
             </p>
           ) : (

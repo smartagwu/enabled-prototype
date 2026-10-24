@@ -1,15 +1,17 @@
 import { useAppStore } from '../../store/useAppStore'
-import { followStateBetween } from '../../lib/selectors'
+import { followStateBetween, isBlockedEitherWay } from '../../lib/selectors'
 import { useAnnounce } from '../common/AnnounceContext'
 
 export function FollowButton({ targetUserId, targetName }: { targetUserId: string; targetName: string }) {
   const currentUserId = useAppStore((state) => state.currentUserId)
   const follows = useAppStore((state) => state.follows)
+  const blocks = useAppStore((state) => state.blocks)
   const sendFollowRequest = useAppStore((state) => state.sendFollowRequest)
   const unfollow = useAppStore((state) => state.unfollow)
   const announce = useAnnounce()
 
   if (!currentUserId || currentUserId === targetUserId) return null
+  if (isBlockedEitherWay(blocks, currentUserId, targetUserId)) return null
 
   const status = followStateBetween(follows, currentUserId, targetUserId)
 
@@ -18,6 +20,7 @@ export function FollowButton({ targetUserId, targetName }: { targetUserId: strin
       <button
         type="button"
         className="btn-secondary"
+        aria-label={`Following ${targetName}. Select to unfollow.`}
         onClick={() => {
           unfollow(currentUserId, targetUserId)
           announce(`Unfollowed ${targetName}`)
@@ -33,6 +36,7 @@ export function FollowButton({ targetUserId, targetName }: { targetUserId: strin
       <button
         type="button"
         className="btn-secondary"
+        aria-label={`Requested. Cancel follow request to ${targetName}.`}
         onClick={() => {
           unfollow(currentUserId, targetUserId)
           announce(`Cancelled follow request to ${targetName}`)
@@ -47,6 +51,7 @@ export function FollowButton({ targetUserId, targetName }: { targetUserId: strin
     <button
       type="button"
       className="btn-primary"
+      aria-label={`Follow ${targetName}`}
       onClick={() => {
         sendFollowRequest(currentUserId, targetUserId)
         announce(`Follow request sent to ${targetName}`)

@@ -34,6 +34,8 @@ export function MentionTextarea({
 
   const candidates = query !== null ? findMentionCandidates(users, query) : []
   const listboxId = `${id}-mention-listbox`
+  const hintId = `${id}-mention-hint`
+  const listOpen = query !== null && candidates.length > 0
 
   function syncMentionQuery(nextValue: string, cursor: number) {
     const before = nextValue.slice(0, cursor)
@@ -76,7 +78,8 @@ export function MentionTextarea({
     } else if (event.key === 'ArrowUp') {
       event.preventDefault()
       setActiveIndex((i) => (i - 1 + candidates.length) % candidates.length)
-    } else if (event.key === 'Enter' || event.key === 'Tab') {
+    } else if (event.key === 'Enter') {
+      // Enter (not Tab) picks a suggestion, so Tab keeps moving through the page as normal.
       event.preventDefault()
       selectCandidate(candidates[activeIndex].name)
     } else if (event.key === 'Escape') {
@@ -99,35 +102,48 @@ export function MentionTextarea({
         onChange={(e) => handleChange(e.target.value)}
         onKeyDown={handleKeyDown}
         role="combobox"
-        aria-expanded={query !== null && candidates.length > 0}
-        aria-controls={listboxId}
+        aria-expanded={listOpen}
+        aria-haspopup="listbox"
+        aria-controls={listOpen ? listboxId : undefined}
         aria-autocomplete="list"
-        aria-activedescendant={query !== null && candidates[activeIndex] ? `${listboxId}-${candidates[activeIndex].id}` : undefined}
+        aria-describedby={hintId}
+        aria-activedescendant={listOpen && candidates[activeIndex] ? `${listboxId}-${candidates[activeIndex].id}` : undefined}
       />
-      <p className="mt-1 text-xs text-slate-500">Type @ to mention someone.</p>
-      {query !== null && candidates.length > 0 && (
+      <p id={hintId} className="mt-1 text-xs text-slate-600">
+        Type @ to mention someone.
+      </p>
+      <p role="status" aria-live="polite" className="sr-only">
+        {query === null
+          ? ''
+          : candidates.length === 0
+            ? 'No matching people'
+            : `${candidates.length} ${candidates.length === 1 ? 'suggestion' : 'suggestions'} available. Use the up and down arrow keys to review and Enter to select.`}
+      </p>
+      {listOpen && (
         <ul
           id={listboxId}
           role="listbox"
           aria-label="Mention suggestions"
-          className="absolute z-20 mt-1 w-full max-w-xs overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg"
+          className="absolute z-20 mt-1 w-full max-w-xs overflow-hidden rounded-lg border border-slate-200 bg-surface shadow-lg"
         >
           {candidates.map((user, index) => (
-            <li key={user.id} id={`${listboxId}-${user.id}`} role="option" aria-selected={index === activeIndex}>
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => selectCandidate(user.name)}
-                className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm ${
-                  index === activeIndex ? 'bg-brand-50' : 'hover:bg-slate-50'
-                }`}
-              >
-                <Avatar id={user.id} name={user.name} size="sm" />
-                <span>
-                  <span className="block font-medium text-slate-900">{user.name}</span>
-                  <span className="block text-xs text-slate-500">{user.headline}</span>
-                </span>
-              </button>
+            // Options are driven from the textarea (focus never leaves it), so they are not tab stops.
+            <li
+              key={user.id}
+              id={`${listboxId}-${user.id}`}
+              role="option"
+              aria-selected={index === activeIndex}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => selectCandidate(user.name)}
+              className={`flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm ${
+                index === activeIndex ? 'bg-brand-50' : 'hover:bg-slate-50'
+              }`}
+            >
+              <Avatar id={user.id} name={user.name} size="sm" />
+              <span>
+                <span className="block font-medium text-slate-900">{user.name}</span>
+                <span className="block text-xs text-slate-600">{user.headline}</span>
+              </span>
             </li>
           ))}
         </ul>

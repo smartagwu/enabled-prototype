@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom'
 import { useAppStore } from '../../store/useAppStore'
 import { segmentBodyWithMentions } from '../../lib/mentions'
 
-export function MentionText({ body, className = '' }: { body: string; className?: string }) {
+/** `onDark` is for text on a dark fill (e.g. your own message bubble), where the usual link colour would vanish. */
+export function MentionText({ body, className = '', onDark = false }: { body: string; className?: string; onDark?: boolean }) {
   const users = useAppStore((state) => state.users)
   const segments = segmentBodyWithMentions(body, users)
 
@@ -13,7 +14,7 @@ export function MentionText({ body, className = '' }: { body: string; className?
           <Link
             key={index}
             to={`/profile/${segment.userId}`}
-            className="font-medium text-brand-700 underline-offset-2 hover:underline"
+            className={`font-medium underline underline-offset-2 ${onDark ? 'text-white' : 'text-brand-700'}`}
           >
             {segment.text}
           </Link>

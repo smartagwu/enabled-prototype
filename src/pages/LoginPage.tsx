@@ -1,17 +1,27 @@
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAppStore } from '../store/useAppStore'
 import { Avatar } from '../components/common/Avatar'
+import { focusPageHeading } from '../lib/focus'
 
 export function LoginPage() {
   const currentUserId = useAppStore((state) => state.currentUserId)
   const users = useAppStore((state) => state.users)
   const setCurrentUser = useAppStore((state) => state.setCurrentUser)
   const navigate = useNavigate()
+  const location = useLocation()
+
+  useEffect(() => {
+    document.title = 'Choose a profile · Enabled'
+    // Signing out passes this flag so focus doesn't fall to <body>; a plain page load is left alone.
+    if ((location.state as { focusHeading?: boolean } | null)?.focusHeading) focusPageHeading()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   if (currentUserId) return <Navigate to="/" replace />
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-4 py-10">
+    <main className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-4 py-10">
       <div className="mb-8 flex flex-col items-center text-center">
         <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-700 text-2xl font-bold text-white">
           E
@@ -37,7 +47,7 @@ export function LoginPage() {
               <Avatar id={user.id} name={user.name} size="lg" />
               <span className="min-w-0">
                 <span className="block font-semibold text-slate-900">{user.name}</span>
-                <span className="block text-sm text-slate-500">{user.pronouns}</span>
+                <span className="block text-sm text-slate-600">{user.pronouns}</span>
                 <span className="block truncate text-sm text-slate-600">{user.headline}</span>
               </span>
             </button>
@@ -45,7 +55,7 @@ export function LoginPage() {
         ))}
       </ul>
 
-      <p className="mt-8 text-center text-sm text-slate-500">You can switch profiles anytime from the account menu.</p>
-    </div>
+      <p className="mt-8 text-center text-sm text-slate-600">You can switch profiles anytime from the account menu.</p>
+    </main>
   )
 }

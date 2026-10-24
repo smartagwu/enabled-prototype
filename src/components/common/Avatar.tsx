@@ -14,12 +14,12 @@ const SIZE_CLASSES: Record<NonNullable<AvatarProps['size']>, string> = {
   xl: 'h-20 w-20 text-xl',
 }
 
+/** Decorative: every use sits next to the person's name, so it is hidden from assistive tech. */
 export function Avatar({ id, name, size = 'md', className = '' }: AvatarProps) {
   const palette = paletteFor(id)
   return (
     <span
-      role="img"
-      aria-label={`${name}'s avatar`}
+      aria-hidden="true"
       className={`inline-flex shrink-0 select-none items-center justify-center rounded-full font-semibold ${palette.bg} ${palette.text} ${SIZE_CLASSES[size]} ${className}`}
     >
       {initialsFor(name)}

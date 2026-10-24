@@ -30,7 +30,7 @@ export function CreateForumModal({ onClose }: { onClose: () => void }) {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="forum-title" className="label">
-            Forum name
+            Forum name <span className="font-normal text-slate-600">(required)</span>
           </label>
           <input
             id="forum-title"

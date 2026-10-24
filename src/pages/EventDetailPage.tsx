@@ -4,7 +4,9 @@ import { useAppStore } from '../store/useAppStore'
 import { RsvpControls } from '../components/events/RsvpControls'
 import { TicketPurchaseModal } from '../components/events/TicketPurchaseModal'
 import { EmptyState } from '../components/common/EmptyState'
-import { formatCurrency, formatEventRange } from '../lib/format'
+import { Disclosure } from '../components/common/Disclosure'
+import { formatCurrency, formatEventRange, formatShortDate, formatTime } from '../lib/format'
+import { isFreeEvent, spotsRemaining } from '../lib/selectors'
 
 export function EventDetailPage() {
   const { eventId } = useParams<{ eventId: string }>()
@@ -17,7 +19,9 @@ export function EventDetailPage() {
   }
 
   const goingCount = event.rsvps.filter((r) => r.status === 'going').length
-  const spotsLeft = Math.max(0, event.capacity - goingCount)
+  const spotsLeft = spotsRemaining(event)
+  const free = isFreeEvent(event)
+  const lowestPrice = Math.min(...event.ticketTiers.map((t) => t.price))
   const myTickets = currentUserId ? event.tickets.filter((t) => t.userId === currentUserId) : []
 
   return (
@@ -40,16 +44,36 @@ export function EventDetailPage() {
         </p>
       </div>
 
-      <div className="card space-y-3 p-4">
+      <div className="card space-y-4 p-4">
+        <dl className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+          <div>
+            <dt className="text-xs font-medium text-slate-600">When</dt>
+            <dd className="font-medium text-slate-900">
+              {formatShortDate(event.startsAt)}, {formatTime(event.startsAt)}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium text-slate-600">Where</dt>
+            <dd className="font-medium text-slate-900">{event.location.name}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium text-slate-600">Price</dt>
+            <dd className="font-medium text-slate-900">{free ? 'Free' : `From ${formatCurrency(lowestPrice)}`}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium text-slate-600">Spots left</dt>
+            <dd className="font-medium text-slate-900">
+              {spotsLeft} of {event.capacity}
+              <span className="block text-xs font-normal text-slate-600">{goingCount} going</span>
+            </dd>
+          </div>
+        </dl>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <RsvpControls event={event} />
           <button type="button" className="btn-primary sm:shrink-0" onClick={() => setShowTicketModal(true)}>
-            Get tickets
+            {free ? 'Register (free)' : 'Get tickets'}
           </button>
         </div>
-        <p className="text-sm text-slate-500">
-          {goingCount} going · {spotsLeft} of {event.capacity} spots left
-        </p>
       </div>
 
       {myTickets.length > 0 && (
@@ -85,8 +109,7 @@ export function EventDetailPage() {
         </ul>
       </section>
 
-      <section>
-        <h2 className="mb-2 text-lg font-semibold text-slate-900">Timeline</h2>
+      <Disclosure title="Timeline">
         <ol className="space-y-3 border-l-2 border-brand-100 pl-4">
           {event.agenda.map((item) => (
             <li key={item.time}>
@@ -96,7 +119,7 @@ export function EventDetailPage() {
             </li>
           ))}
         </ol>
-      </section>
+      </Disclosure>
 
       <section>
         <h2 className="mb-2 text-lg font-semibold text-slate-900">Instructions</h2>
@@ -112,14 +135,13 @@ export function EventDetailPage() {
         <p className="text-sm text-slate-700">{event.whoCanAttend}</p>
       </section>
 
-      <section>
-        <h2 className="mb-2 text-lg font-semibold text-slate-900">Things to know</h2>
+      <Disclosure title="Things to know">
         <ul className="list-disc space-y-1 pl-5 text-sm text-slate-700">
           {event.thingsToKnow.map((item) => (
             <li key={item}>{item}</li>
           ))}
         </ul>
-      </section>
+      </Disclosure>
 
       <section>
         <h2 className="mb-2 text-lg font-semibold text-slate-900">Tickets</h2>
