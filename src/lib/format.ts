@@ -1,6 +1,7 @@
 const dateFmt = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
 const timeFmt = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' })
 const shortDateFmt = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' })
+const dateTimeFmt = new Intl.DateTimeFormat('en-US', { dateStyle: 'full', timeStyle: 'short' })
 const relativeFmt = new Intl.RelativeTimeFormat('en-US', { numeric: 'auto' })
 
 export function formatEventDate(iso: string): string {
@@ -17,6 +18,10 @@ export function formatEventRange(startIso: string, endIso: string): string {
 
 export function formatShortDate(iso: string): string {
   return shortDateFmt.format(new Date(iso))
+}
+
+export function formatDateTime(iso: string): string {
+  return dateTimeFmt.format(new Date(iso))
 }
 
 export function formatRelativeTime(iso: string, nowIso: string): string {

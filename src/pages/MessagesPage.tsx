@@ -6,21 +6,28 @@ import { MessageThread } from '../components/messages/MessageThread'
 import { NewMessageModal } from '../components/messages/NewMessageModal'
 import { CreateGroupModal } from '../components/groups/CreateGroupModal'
 import { EmptyState } from '../components/common/EmptyState'
+import { hasBlocked } from '../lib/selectors'
 
 export function MessagesPage() {
   const { conversationId } = useParams<{ conversationId: string }>()
   const currentUserId = useAppStore((state) => state.currentUserId)
-  const conversations = useAppStore((state) =>
+  const allConversations = useAppStore((state) =>
     state.conversations.filter((c) => currentUserId && c.participantIds.includes(currentUserId)),
   )
+  const blocks = useAppStore((state) => state.blocks)
   const [showNewMessage, setShowNewMessage] = useState(false)
   const [showNewGroup, setShowNewGroup] = useState(false)
+
+  // A direct conversation with someone you've blocked is hidden.
+  const conversations = allConversations.filter(
+    (c) => !(c.type === 'dm' && currentUserId && c.participantIds.some((id) => hasBlocked(blocks, currentUserId, id))),
+  )
 
   const activeConversation = conversations.find((c) => c.id === conversationId)
 
   return (
     <div className="mx-auto max-w-4xl">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-slate-900">Messages</h1>
         <div className="flex gap-2">
           <button type="button" className="btn-secondary" onClick={() => setShowNewGroup(true)}>
@@ -48,14 +55,21 @@ export function MessagesPage() {
         <div className={conversationId ? '' : 'hidden sm:block'}>
           {activeConversation ? (
             <div className="flex h-full flex-col">
-              <Link to="/messages" className="btn-ghost m-2 w-fit text-xs sm:hidden">
+              <Link to="/messages" className="btn-ghost m-2 w-fit sm:hidden">
                 ← Back to conversations
               </Link>
-              <MessageThread conversation={activeConversation} />
+              <MessageThread key={activeConversation.id} conversation={activeConversation} />
             </div>
           ) : (
-            <div className="flex h-full items-center justify-center p-8 text-center text-sm text-slate-500">
-              Select a conversation, or start a new message.
+            <div className="flex h-full flex-col">
+              {conversationId && (
+                <Link to="/messages" className="btn-ghost m-2 w-fit sm:hidden">
+                  ← Back to conversations
+                </Link>
+              )}
+              <div className="flex flex-1 items-center justify-center p-8 text-center text-sm text-slate-600">
+                Select a conversation, or start a new message.
+              </div>
             </div>
           )}
         </div>

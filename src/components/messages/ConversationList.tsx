@@ -2,8 +2,8 @@ import { NavLink } from 'react-router-dom'
 import type { Conversation, User } from '../../types'
 import { useAppStore } from '../../store/useAppStore'
 import { Avatar } from '../common/Avatar'
-import { userById } from '../../lib/selectors'
-import { formatRelativeTime } from '../../lib/format'
+import { RelativeTime } from '../common/RelativeTime'
+import { hasBlocked, userById } from '../../lib/selectors'
 
 function conversationLabel(conversation: Conversation, currentUserId: string, users: User[]) {
   if (conversation.type === 'group') return conversation.name || 'Group chat'
@@ -14,7 +14,7 @@ function conversationLabel(conversation: Conversation, currentUserId: string, us
 export function ConversationList({ conversations }: { conversations: Conversation[] }) {
   const users = useAppStore((state) => state.users)
   const currentUserId = useAppStore((state) => state.currentUserId)
-  const now = new Date().toISOString()
+  const blocks = useAppStore((state) => state.blocks)
 
   const sorted = [...conversations].sort((a, b) => {
     const aLast = a.messages.at(-1)?.createdAt ?? a.createdAt
@@ -28,7 +28,7 @@ export function ConversationList({ conversations }: { conversations: Conversatio
     <nav aria-label="Conversations" className="divide-y divide-slate-100">
       {sorted.map((conversation) => {
         const label = conversationLabel(conversation, currentUserId, users)
-        const lastMessage = conversation.messages.at(-1)
+        const lastMessage = conversation.messages.filter((m) => !hasBlocked(blocks, currentUserId, m.senderId)).at(-1)
         const avatarId = conversation.type === 'group' ? conversation.id : conversation.participantIds.find((id) => id !== currentUserId) ?? conversation.id
 
         return (
@@ -36,7 +36,7 @@ export function ConversationList({ conversations }: { conversations: Conversatio
             key={conversation.id}
             to={`/messages/${conversation.id}`}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-3 text-left hover:bg-slate-50 ${isActive ? 'bg-brand-50' : ''}`
+              `flex items-center gap-3 px-3 py-3 text-left hover:bg-slate-50 focus-visible:-outline-offset-2 ${isActive ? 'bg-brand-50' : ''}`
             }
           >
             <Avatar id={avatarId} name={label} />
@@ -44,10 +44,10 @@ export function ConversationList({ conversations }: { conversations: Conversatio
               <div className="flex items-baseline justify-between gap-2">
                 <span className="truncate font-medium text-slate-900">{label}</span>
                 {lastMessage && (
-                  <span className="shrink-0 text-xs text-slate-500">{formatRelativeTime(lastMessage.createdAt, now)}</span>
+                  <RelativeTime iso={lastMessage.createdAt} className="shrink-0 text-xs text-slate-600" />
                 )}
               </div>
-              <p className="truncate text-sm text-slate-500">
+              <p className="truncate text-sm text-slate-600">
                 {lastMessage ? lastMessage.body : 'No messages yet — say hello!'}
               </p>
             </div>

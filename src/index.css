@@ -3,16 +3,91 @@
 @tailwind utilities;
 
 @layer base {
+  /* Colours are space-separated RGB triplets so Tailwind can apply opacity (see tailwind.config.js). */
   :root {
     color-scheme: light;
+    --page: 248 250 252;
+    --surface: 255 255 255;
+    --slate-50: 248 250 252;
+    --slate-100: 241 245 249;
+    --slate-200: 226 232 240;
+    --slate-300: 203 213 225;
+    --slate-400: 148 163 184;
+    --slate-500: 100 116 139;
+    --slate-600: 71 85 105;
+    --slate-700: 51 65 85;
+    --slate-800: 30 41 59;
+    --slate-900: 15 23 42;
+  }
+
+  /* Display preferences (AccountMenu > Display) arrive as data-* attributes on <html>. */
+  html[data-theme='dark'] {
+    color-scheme: dark;
+    --page: 2 6 23;
+    --surface: 15 23 42;
+    --slate-50: 23 32 51;
+    --slate-100: 30 41 59;
+    --slate-200: 51 65 85;
+    --slate-300: 71 85 105;
+    --slate-400: 100 116 139;
+    --slate-500: 148 163 184;
+    --slate-600: 176 188 204;
+    --slate-700: 203 213 225;
+    --slate-800: 226 232 240;
+    --slate-900: 241 245 249;
+  }
+
+  html[data-contrast='more'] {
+    --slate-100: 203 213 225;
+    --slate-200: 100 116 139;
+    --slate-300: 71 85 105;
+    --slate-400: 51 65 85;
+    --slate-500: 30 41 59;
+    --slate-600: 15 23 42;
+    --slate-700: 15 23 42;
+    --slate-800: 2 6 23;
+    --slate-900: 2 6 23;
+  }
+
+  html[data-theme='dark'][data-contrast='more'] {
+    --page: 0 0 0;
+    --surface: 0 0 0;
+    --slate-50: 30 41 59;
+    --slate-100: 71 85 105;
+    --slate-200: 148 163 184;
+    --slate-300: 176 188 204;
+    --slate-400: 203 213 225;
+    --slate-500: 226 232 240;
+    --slate-600: 241 245 249;
+    --slate-700: 248 250 252;
+    --slate-800: 255 255 255;
+    --slate-900: 255 255 255;
   }
 
   html {
     -webkit-text-size-adjust: 100%;
+    /* Keep focused elements clear of the sticky header and the mobile tab bar. */
+    scroll-padding-block: 5rem;
+  }
+
+  /* From md up the primary nav sits inside the sticky header too, which makes it about 7rem tall. */
+  @media (min-width: 768px) {
+    html {
+      scroll-padding-top: 8rem;
+    }
+  }
+
+  /* Text size is a root font-size change: Tailwind sizes are rem-based, so everything scales with it. */
+  html[data-text-size='125'] {
+    font-size: 125%;
+  }
+
+  html[data-text-size='150'] {
+    font-size: 150%;
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
+    @apply bg-page text-slate-900 antialiased;
   }
 
   /* Strong, visible focus ring everywhere, for keyboard users */
@@ -22,6 +97,14 @@
 
   h1, h2, h3, h4 {
     @apply font-semibold tracking-tight;
+  }
+
+  html[data-contrast='more'] :focus-visible {
+    @apply outline-4;
+  }
+
+  html[data-contrast='more'] main a {
+    @apply underline underline-offset-2;
   }
 }
 
@@ -39,11 +122,11 @@
   }
 
   .btn-secondary {
-    @apply btn bg-white text-brand-800 ring-1 ring-inset ring-slate-300 hover:bg-slate-50;
+    @apply btn bg-surface text-brand-800 ring-1 ring-inset ring-slate-300 hover:bg-slate-50;
   }
 
   .btn-danger {
-    @apply btn bg-white text-red-700 ring-1 ring-inset ring-red-300 hover:bg-red-50;
+    @apply btn bg-surface text-red-700 ring-1 ring-inset ring-red-300 hover:bg-red-50;
   }
 
   .btn-ghost {
@@ -51,7 +134,7 @@
   }
 
   .card {
-    @apply rounded-xl border border-slate-200 bg-white shadow-sm;
+    @apply rounded-xl border border-slate-200 bg-surface shadow-sm;
   }
 
   .card-interactive {
@@ -59,7 +142,7 @@
   }
 
   .input {
-    @apply min-h-[44px] w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-brand-600;
+    @apply min-h-[44px] w-full rounded-lg border border-slate-500 bg-surface px-3 py-2 text-sm text-slate-900 placeholder:text-slate-600 transition-colors focus:border-brand-600;
   }
 
   .label {
@@ -75,4 +158,91 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* Dark theme: slate/surface flip through the variables above; these classes need explicit values. */
+html[data-theme='dark'] :focus-visible {
+  outline-color: #93b6fd;
+}
+
+html[data-theme='dark'] .text-brand-700,
+html[data-theme='dark'] .text-brand-800,
+html[data-theme='dark'] .btn-secondary {
+  color: #93b6fd;
+}
+
+/* Filled brand surfaces carry state (current page, selected option), so on the dark theme they need 3:1 against the
+   dark background: brand-700 is only 2.2:1 there. brand-500 is 3.8:1 and still gives white text 4.7:1. */
+html[data-theme='dark'] .bg-brand-700,
+html[data-theme='dark'] .btn-primary,
+html[data-theme='dark'] .peer:checked ~ .peer-checked\:bg-brand-700 {
+  background-color: #3b68f5;
+}
+
+html[data-theme='dark'] .btn-primary:hover {
+  background-color: #2547e9;
+}
+
+/* The text-size radio chips draw their own focus ring (the input itself is visually hidden). */
+html[data-theme='dark'] .peer:focus-visible ~ .peer-focus-visible\:outline-brand-600 {
+  outline-color: #93b6fd;
+}
+
+html[data-theme='dark'] .accent-brand-700 {
+  accent-color: #3b68f5;
+}
+
+/* The timestamp in your own message bubble: brand-100 on brand-500 would be only 3.9:1. */
+html[data-theme='dark'] .text-brand-100 {
+  color: #fff;
+}
+
+html[data-theme='dark'] .text-brand-900 {
+  color: #bfd4fe;
+}
+
+html[data-theme='dark'] .bg-brand-50 {
+  background-color: rgb(32 45 132 / 0.45);
+}
+
+html[data-theme='dark'] .border-brand-100,
+html[data-theme='dark'] .border-brand-200 {
+  border-color: rgb(96 143 250 / 0.4);
+}
+
+html[data-theme='dark'] .text-red-700,
+html[data-theme='dark'] .btn-danger {
+  color: #fca5a5;
+}
+
+html[data-theme='dark'] .hover\:bg-red-50:hover,
+html[data-theme='dark'] .btn-danger:hover {
+  background-color: rgb(127 29 29 / 0.35);
+}
+
+/* Reduced motion: the OS setting and the manual setting in AccountMenu do the same thing. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .card-interactive:hover {
+    transform: none;
+  }
+}
+
+html[data-motion='reduce'] *,
+html[data-motion='reduce'] ::before,
+html[data-motion='reduce'] ::after {
+  transition-duration: 0.01ms !important;
+  animation-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+html[data-motion='reduce'] .card-interactive:hover {
+  transform: none;
 }

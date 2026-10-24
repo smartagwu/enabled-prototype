@@ -2,15 +2,19 @@ import { useState } from 'react'
 import { useAppStore } from '../store/useAppStore'
 import { UserCard } from '../components/users/UserCard'
 import { EmptyState } from '../components/common/EmptyState'
+import { ResultsStatus } from '../components/common/ResultsStatus'
+import { isBlockedEitherWay } from '../lib/selectors'
 
 export function DiscoverPage() {
   const users = useAppStore((state) => state.users)
   const currentUserId = useAppStore((state) => state.currentUserId)
+  const blocks = useAppStore((state) => state.blocks)
   const [query, setQuery] = useState('')
 
   const q = query.trim().toLowerCase()
   const results = users
     .filter((u) => u.id !== currentUserId)
+    .filter((u) => !currentUserId || !isBlockedEitherWay(blocks, currentUserId, u.id))
     .filter(
       (u) =>
         !q ||
@@ -40,6 +44,8 @@ export function DiscoverPage() {
           onChange={(e) => setQuery(e.target.value)}
         />
       </div>
+
+      <ResultsStatus count={results.length} />
 
       {results.length === 0 ? (
         <EmptyState title="No members found" description="Try a different search term." />

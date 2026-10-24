@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { useAppStore } from '../store/useAppStore'
 import { PostComposer } from '../components/posts/PostComposer'
@@ -6,6 +7,7 @@ import { Avatar } from '../components/common/Avatar'
 import { EmptyState } from '../components/common/EmptyState'
 import { userById } from '../lib/selectors'
 import { useAnnounce } from '../components/common/AnnounceContext'
+import { focusNeighbourAfterRemoval, focusPageHeading } from '../lib/focus'
 
 export function ForumDetailPage() {
   const { forumId } = useParams<{ forumId: string }>()
@@ -15,9 +17,12 @@ export function ForumDetailPage() {
   const currentUserId = useAppStore((state) => state.currentUserId)
   const joinPublicForum = useAppStore((state) => state.joinPublicForum)
   const requestToJoinForum = useAppStore((state) => state.requestToJoinForum)
+  const cancelJoinRequest = useAppStore((state) => state.cancelJoinRequest)
   const respondToJoinRequest = useAppStore((state) => state.respondToJoinRequest)
   const leaveForum = useAppStore((state) => state.leaveForum)
   const announce = useAnnounce()
+  // The request / pending / cancel buttons replace each other, so focus follows whichever is showing.
+  const requestButtonRef = useRef<HTMLButtonElement>(null)
 
   if (!forum || !currentUserId) {
     return <EmptyState title="Forum not found" description="This forum doesn't exist or may have been removed." />
@@ -55,6 +60,8 @@ export function ForumDetailPage() {
               onClick={() => {
                 joinPublicForum(forum.id, currentUserId)
                 announce(`Joined ${forum.title}`)
+                // This button is replaced by the Leave button, so keep focus on the page.
+                requestAnimationFrame(() => focusPageHeading())
               }}
             >
               Join forum
@@ -63,11 +70,13 @@ export function ForumDetailPage() {
 
           {!isMember && forum.visibility === 'private' && myJoinRequest?.status !== 'pending' && (
             <button
+              ref={requestButtonRef}
               type="button"
               className="btn-primary"
               onClick={() => {
                 requestToJoinForum(forum.id, currentUserId)
                 announce(`Requested to join ${forum.title}`)
+                requestAnimationFrame(() => requestButtonRef.current?.focus())
               }}
             >
               {myJoinRequest?.status === 'declined' ? 'Request again' : 'Request to join'}
@@ -75,9 +84,29 @@ export function ForumDetailPage() {
           )}
 
           {!isMember && myJoinRequest?.status === 'pending' && (
-            <button type="button" className="btn-secondary" disabled>
-              Request pending
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              {/* aria-disabled rather than disabled, so it stays focusable and readable. */}
+              <button
+                ref={requestButtonRef}
+                type="button"
+                className="btn-secondary cursor-default hover:bg-surface"
+                aria-disabled="true"
+                onClick={(e) => e.preventDefault()}
+              >
+                Request pending
+              </button>
+              <button
+                type="button"
+                className="btn-ghost"
+                onClick={() => {
+                  cancelJoinRequest(forum.id, currentUserId)
+                  announce(`Cancelled request to join ${forum.title}`)
+                  requestAnimationFrame(() => requestButtonRef.current?.focus())
+                }}
+              >
+                Cancel request
+              </button>
+            </div>
           )}
 
           {isMember && !isOwner && (
@@ -87,6 +116,7 @@ export function ForumDetailPage() {
               onClick={() => {
                 leaveForum(forum.id, currentUserId)
                 announce(`Left ${forum.title}`)
+                requestAnimationFrame(() => focusPageHeading())
               }}
             >
               Leave forum
@@ -95,7 +125,7 @@ export function ForumDetailPage() {
         </div>
 
         <p className="mt-3 text-sm text-slate-700">{forum.description}</p>
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-3 text-xs text-slate-600">
           {forum.memberIds.length} member{forum.memberIds.length === 1 ? '' : 's'} · Created by{' '}
           {owner?.name ?? 'a member'}
         </p>
@@ -117,8 +147,10 @@ export function ForumDetailPage() {
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      className="btn-primary px-3 py-1 text-xs"
-                      onClick={() => {
+                      className="btn-primary px-3"
+                      aria-label={`Approve ${requester.name} to join ${forum.title}`}
+                      onClick={(e) => {
+                        focusNeighbourAfterRemoval(e.currentTarget.closest('li'))
                         respondToJoinRequest(forum.id, request.userId, true)
                         announce(`Approved ${requester.name} to join ${forum.title}`)
                       }}
@@ -127,8 +159,10 @@ export function ForumDetailPage() {
                     </button>
                     <button
                       type="button"
-                      className="btn-secondary px-3 py-1 text-xs"
-                      onClick={() => {
+                      className="btn-secondary px-3"
+                      aria-label={`Decline ${requester.name}'s request to join ${forum.title}`}
+                      onClick={(e) => {
+                        focusNeighbourAfterRemoval(e.currentTarget.closest('li'))
                         respondToJoinRequest(forum.id, request.userId, false)
                         announce(`Declined ${requester.name}'s request to join ${forum.title}`)
                       }}

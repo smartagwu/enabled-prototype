@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { EventItem } from '../../types'
 import { formatEventRange } from '../../lib/format'
+import { spotsRemaining } from '../../lib/selectors'
 
 export function EventCard({ event }: { event: EventItem }) {
   const goingCount = event.rsvps.filter((r) => r.status === 'going').length
@@ -15,11 +16,11 @@ export function EventCard({ event }: { event: EventItem }) {
         <span className="w-fit rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-800">
           {event.category}
         </span>
-        <h3 className="text-base font-semibold text-slate-900 group-hover:underline">{event.title}</h3>
+        <h2 className="text-base font-semibold text-slate-900 group-hover:underline">{event.title}</h2>
         <p className="text-sm text-slate-600">{formatEventRange(event.startsAt, event.endsAt)}</p>
-        <p className="text-sm text-slate-500">{event.location.name}</p>
-        <p className="mt-auto text-xs text-slate-500">
-          {goingCount} going · {event.capacity - goingCount} spots left
+        <p className="text-sm text-slate-600">{event.location.name}</p>
+        <p className="mt-auto text-xs text-slate-600">
+          {goingCount} going · {spotsRemaining(event)} spots left
         </p>
       </div>
     </Link>

@@ -12,33 +12,48 @@ export function RsvpControls({ event }: { event: EventItem }) {
 
   const myRsvp = event.rsvps.find((r) => r.userId === currentUserId)
 
+  // Pressing a pressed button again withdraws that response, as aria-pressed implies.
+  function toggle(status: 'going' | 'interested', announcement: string) {
+    if (!currentUserId) return
+    if (myRsvp?.status === status) {
+      cancelRsvp(event.id, currentUserId)
+      announce(`RSVP cancelled for ${event.title}`)
+    } else {
+      rsvpToEvent(event.id, currentUserId, status)
+      announce(announcement)
+    }
+  }
+
+  const isGoing = myRsvp?.status === 'going'
+  const isInterested = myRsvp?.status === 'interested'
+
   return (
     <div role="group" aria-label="RSVP to this event" className="flex flex-wrap items-center gap-2">
       <button
         type="button"
-        className={myRsvp?.status === 'going' ? 'btn-primary' : 'btn-secondary'}
-        onClick={() => {
-          rsvpToEvent(event.id, currentUserId, 'going')
-          announce(`RSVP'd as going to ${event.title}`)
-        }}
+        aria-pressed={isGoing}
+        className={isGoing ? 'btn-primary' : 'btn-secondary'}
+        onClick={() => toggle('going', `RSVP'd as going to ${event.title}`)}
       >
-        {myRsvp?.status === 'going' ? "✓ You're going" : "I'm going"}
+        {isGoing && <span aria-hidden="true">✓</span>}
+        I'm going
       </button>
       <button
         type="button"
-        className={myRsvp?.status === 'interested' ? 'btn-primary' : 'btn-secondary'}
-        onClick={() => {
-          rsvpToEvent(event.id, currentUserId, 'interested')
-          announce(`Marked interested in ${event.title}`)
-        }}
+        aria-pressed={isInterested}
+        className={isInterested ? 'btn-primary' : 'btn-secondary'}
+        onClick={() => toggle('interested', `Marked interested in ${event.title}`)}
       >
-        {myRsvp?.status === 'interested' ? '✓ Interested' : 'Interested'}
+        {isInterested && <span aria-hidden="true">✓</span>}
+        Interested
       </button>
       {myRsvp && (
         <button
           type="button"
-          className="min-h-[44px] rounded-lg px-2 text-sm font-medium text-slate-500 underline-offset-2 hover:text-slate-700 hover:underline"
-          onClick={() => {
+          className="min-h-[44px] rounded-lg px-2 text-sm font-medium text-slate-600 underline-offset-2 hover:text-slate-800 hover:underline"
+          onClick={(e) => {
+            // This button disappears once the RSVP is cancelled; move focus to the first RSVP button.
+            e.currentTarget.parentElement?.querySelector('button')?.focus()
             cancelRsvp(event.id, currentUserId)
             announce(`RSVP cancelled for ${event.title}`)
           }}

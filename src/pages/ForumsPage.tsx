@@ -3,6 +3,7 @@ import { useAppStore } from '../store/useAppStore'
 import { ForumCard } from '../components/forums/ForumCard'
 import { CreateForumModal } from '../components/forums/CreateForumModal'
 import { EmptyState } from '../components/common/EmptyState'
+import { ResultsStatus } from '../components/common/ResultsStatus'
 
 export function ForumsPage() {
   const forums = useAppStore((state) => state.forums)
@@ -41,6 +42,8 @@ export function ForumsPage() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
+
+      <ResultsStatus count={results.length} />
 
       {results.length === 0 ? (
         <EmptyState title="No forums found" description="Try a different search, or start your own forum." />
